@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Farming Overview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        nav {
+            background-color: #136207;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        nav .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        nav .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        nav span {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px #000;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            color: #136207;
+        }
+        .content {
+            padding: 10px;
+        }
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel {
+            display: flex;
+            gap: 20px;
+            scroll-behavior: smooth;
+            overflow-x: scroll;
+            scrollbar-width: none; /* For Firefox */
+        }
+        .carousel::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+        .carousel img {
+            height: 300px;  /* Fixed height for images */
+            width: auto;    /* Width adjusts based on the aspect ratio */
+            border-radius: 10px;
+        }
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .carousel-button.left {
+            left: 10px;
+        }
+        .carousel-button.right {
+            right: 10px;
+        }
+        .developer-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .developer-info img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+        .section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Background colors for each section */
+        .section:nth-child(2) {
+            background: linear-gradient(135deg, #e3ffe7, #d9e7ff);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(3) {
+            background: linear-gradient(135deg, #ffe7e7, #fff5d9);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(4) {
+            background: linear-gradient(135deg, #e7fff5, #d9f5ff);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(5) {
+            background: linear-gradient(135deg, #f5e7ff, #ffd9f5);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(6) {
+            background: linear-gradient(135deg, #fff7e7, #e7d9ff);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode {
+            background-color: #333; /* Changes background to dark gray */
+            color: black; /* Changes text color to white */
+        }
+
+        .dark-mode nav {
+            background-color: #555; /* Darkens the navigation bar */
+        }
+
+        .dark-mode nav a {
+            color: white; /* Keeps links white */
+        }
+        nav button#toggle-dark-mode {
+            background-color: white;
+            color: #136207;
+            border: 2px solid #136207;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+    }
+
+        nav button#toggle-dark-mode:hover {
+            background-color: #136207;
+            color: white;
+    }
+       /* Media query for responsiveness */
+       @media (max-width: 600px) {
+            .image img {
+                max-width: 45%; /* Increase size for better visibility on mobile */
+            }
+            nav span {
+                font-size: 1.2rem;
+            }
+            nav .logo img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+        <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Smart Farming Logo">
+            <span>Smart Farming</span>
+        </div>
+        <div>
+            <a href="#developer-info">Developer Info</a>
+            <a href="#abstract">Abstract</a>
+            <a href="#methodology">Methodology</a>
+            <a href="#results">Results</a>
+            <a href="#conclusion">Conclusion</a>
+        </div>
+        <button id="toggle-dark-mode">
+            <i class="fas fa-lightbulb"></i>
+        </button>
+    </button>
+    </nav>
+
+    <div id="developer-info" class="section">
+        <h2 onclick="toggleSection(this)">Developer Information</h2>
+        <div class="content">
+            <div class="developer-info">
+                <img src="developer.jpeg" alt="Developer Picture">
+                <div>
+                    <p><strong>Name:</strong> Muhammad Hafiy Naim bin Mohd Ismadi</p>
+                    <p><strong>Email:</strong> <a href="mailto:muhdhafiynaim@gmail.com">muhdhafiynaim@gmail.com</a></p>
+                    <p><strong>University:</strong> Universiti Teknologi MARA (UiTM), Shah Alam</p>
+                    <p><strong>LinkedIn:</strong>
+                        <a href="https://www.linkedin.com/in/hafiy-naim-032020182/" target="_blank">
+                            Hafiy Naim's LinkedIn Profile
+                        </a>
+                    </p>
+                    <p><strong>Supervised by:</strong> Dr. Roshakimah Binti Mohd Isa</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="abstract" class="section">
+        <h2>Abstract</h2>
+        <div class="content">
+            <p>The project focuses on smart farming, leveraging IoT technology to address challenges in resource efficiency, climate control, and automation in agriculture. An IoT-based greenhouse control system was developed for household applications using an ESP32 microcontroller and multiple sensors to monitor temperature, humidity, soil moisture, and light levels. Automated actuators such as fans, water pumps, and LEDs ensure optimal growing conditions based on real-time data. Sustainability is enhanced through a solar-powered setup. Data is logged and visualized in Google Sheets, supporting informed decision-making. This system simplifies plant care while promoting eco-friendly and efficient farming practices.</p>
+            <!-- No image carousel, as per your request -->
+        </div>
+    </div>
+
+    <div id="methodology" class="section">
+        <h2>Methodology</h2>
+        <div class="content">
+            <p>The project develops an IoT-enabled system to monitor environmental parameters like temperature, humidity, soil moisture, light intensity, and water levels, optimizing greenhouse conditions. Solar panels with battery storage ensure continuous operation, reducing dependence on non-renewable energy sources. A web-based interface is implemented for real-time monitoring and historical trend analysis via Google Sheets. Automation of key greenhouse functions—irrigation, ventilation, and lighting—is achieved using sensor-driven decision-making algorithms.</p>
+            <div class="carousel-container">
+                <button class="carousel-button left" onclick="scrollCarousel('methodology-carousel', -1)">&#8249;</button>
+                <div id="methodology-carousel" class="carousel">
+                    <a href="https://drive.google.com/drive/u/0/folders/1figRqF-8Bb8HP7AgsXC6mRrl1dXxPYfB" target="_blank">
+                        <img src="methodology-image1.png" alt="Visualization 1">
+                    <a href="https://drive.google.com/drive/u/0/folders/1figRqF-8Bb8HP7AgsXC6mRrl1dXxPYfB" target="_blank">
+                        <img src="methodology-image2.png" alt="Visualization 2">
+                    <a href="https://p3d.in/YPhVF" target="_blank">
+                        <img src="methodology-image3.png" alt="Visualization 3">
+                    <a href="https://sketchfab.com/3d-models/greenhouse-assembly-a2069dee229c43feaa34b894e18d9dd9" target="_blank">
+                        <img src="methodology-image4.png" alt="Visualization 4">
+                    <a href="https://www.youtube.com/watch?v=Vl4yjpisW5g" target="_blank">
+                        <img src="methodology-image5.png" alt="Visualization 5">
+                    </a>
+                </div>
+                <button class="carousel-button right" onclick="scrollCarousel('methodology-carousel', 1)">&#8250;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="results" class="section">
+        <h2>Results</h2>
+        <div class="content">
+            <p>The IoT-Enhanced Greenhouse Control System efficiently optimizes plant growth and minimizes resource consumption. Data logging allows for historical analysis, aiding informed decision-making. Real-time monitoring and control via an intuitive dashboard enhance convenience. Hardware components like solar panels, a durable greenhouse structure, and a 3D-printed control box enable sustainable, user-friendly operation. Automated systems such as irrigation, ventilation, and lighting ensure optimal environmental conditions based on real-time data.</p>
+            <div class="carousel-container">
+                <button class="carousel-button left" onclick="scrollCarousel('results-carousel', -1)">&#8249;</button>
+                <div id="results-carousel" class="carousel">
+                    <!-- Make the first image clickable -->
+                    <a href="https://lookerstudio.google.com/u/0/reporting/833cb432-7a9f-4d14-a4b3-df7ea382f86f/page/7XmSE" target="_blank">
+                        <img src="results-image1.png" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image2.png" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image3.png" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image4.png" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image5.png" alt="Visualization 1">
+                </a>
+                </div>
+                <button class="carousel-button right" onclick="scrollCarousel('results-carousel', 1)">&#8250;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="conclusion" class="section">
+        <h2>Conclusion</h2>
+        <div class="content">
+            <p>The project demonstrates that smart farming technologies significantly reduce energy consumption and greenhouse gas emissions, supporting global sustainability goals. As demand for food and plant-based products grows, IoT-enabled greenhouse systems are poised to lead sustainable farming practices. The iterative design ensures adaptability to evolving challenges, maintaining the relevance of such systems in advancing agriculture.</p>
+            <!-- No image carousel, as per your request -->
+        </div>
+    </div>
+
+    <script>
+         // Toggle dark mode
+        const darkModeButton = document.getElementById('toggle-dark-mode');
+        darkModeButton.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+});
+        function scrollCarousel(id, direction) {
+            const carousel = document.getElementById(id);
+            const scrollAmount = 320; // Adjust this value for scrolling amount
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth',
+            });
+        }
+                // Scroll animation logic
+                const sections = document.querySelectorAll('.section');
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible'); // Adds 'visible' class when in view
+        }
+    });
+}, {
+    threshold: 0.2 // Trigger when 20% of the section is visible
+});
+
+sections.forEach(section => {
+    observer.observe(section); // Observe each section
+});
+    </script>
+</body>
+</html>
