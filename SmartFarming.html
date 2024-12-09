@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Farming Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background-color: #136207;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: #136207;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #136207;
+            padding-bottom: 5px;
+        }
+
+        .input-group {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="file"], button {
+            font-size: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="file"]:focus, button:hover {
+            border-color: #136207;
+            box-shadow: 0 4px 8px rgba(0, 100, 0, 0.2);
+        }
+
+        button {
+            background-color: #136207;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #0f4d05;
+            transform: scale(1.05);
+        }
+
+        .output {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .interactive-icon {
+            font-size: 3rem;
+            color: #136207;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .interactive-icon:hover {
+            color: #0f4d05;
+            transform: scale(1.1);
+        }
+
+        video {
+            margin-top: 15px;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #136207;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"], button {
+                width: 100%;
+            }
+
+            .interactive-icon {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>Smart Farming Dashboard</header>
+
+    <div class="container">
+<!-- Camera Feed -->
+<div>
+    <h3>Live Camera Feed</h3>
+    <video id="cameraFeed" autoplay style="width: 400px; height: 300px; border: 1px solid black;"></video>
+    <button onclick="captureImage()">Capture Image</button>
+    <canvas id="capturedCanvas" style="display: none;"></canvas>
+</div>
+
+<!-- Upload Image -->
+<div>
+    <h3>Upload Plant Image</h3>
+    <input type="file" accept="image/*" onchange="uploadImage(event)" />
+</div>
+
+<!-- Health Result -->
+<div>
+    <h3>Plant Health Analysis</h3>
+    <p id="health-result">Awaiting input...</p>
+</div>
+
+
+        <!-- Section: Plant Growth Requirements -->
+        <div class="section">
+            <h2>Plant Growth Requirements</h2>
+            <p>Enter the plant's name to find its optimal growth conditions.</p>
+            <div class="input-group">
+                <input type="text" id="plantName" placeholder="Enter plant name">
+                <button onclick="fetchPlantDetails()">Get Details</button>
+            </div>
+            <div id="plant-details" class="output">Enter a plant name to see its growth requirements.</div>
+        </div>
+
+        <!-- Section: Weather Information -->
+        <div class="section">
+            <h2>Weather Information</h2>
+            <div id="weather" class="output">
+                Loading weather data...
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2024 Smart Farming - Growing Smarter, Together.</footer>
+
+    <script>
+                // Open camera functionality using getUserMedia
+                function openCamera() {
+            const video = document.getElementById('cameraFeed');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    video.srcObject = stream;
+                })
+                .catch((err) => {
+                    alert('Camera access denied or unavailable.');
+                });
+        }
+        
+        openCamera(); // Automatically open the camera on page load
+
+        // Capture image from the camera feed
+        function captureImage() {
+            const video = document.getElementById('cameraFeed');
+            const canvas = document.getElementById('capturedCanvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw video frame to canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Simulate health analysis
+            analyzeHealth(canvas.toDataURL('image/png'));
+        }
+
+        // Upload image functionality
+        function uploadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imageData = e.target.result;
+                    analyzeHealth(imageData);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Analyze plant health
+        function analyzeHealth(imageData) {
+            // Simulate plant health analysis
+            const healthStatuses = [
+                "Healthy",
+                "Unhealthy (Possible Disease Detected)",
+                "Unhealthy (Lack of Water)",
+                "Unhealthy (Nutrient Deficiency)"
+            ];
+            const randomStatus = healthStatuses[Math.floor(Math.random() * healthStatuses.length)];
+
+            // Display result
+            const healthResult = document.getElementById('health-result');
+            healthResult.innerText = `Plant health status: ${randomStatus}`;
+        }
+
+        // Fetch plant growth requirements
+        function fetchPlantDetails() {
+    const plantName = document.getElementById("plantName").value.toLowerCase();
+    const plantData = {
+        strawberry: { 
+            temperature: "18°C - 25°C", 
+            humidity: "70% - 80%", 
+            water: "3.6 liters/day" // 1 inch/week → 25.4 liters/week ÷ 7
+        },
+        tomato: { 
+            temperature: "20°C - 25°C", 
+            humidity: "50% - 70%", 
+            water: "7.3 liters/day" // 2 inches/week → 50.8 liters/week ÷ 7
+        },
+        chili: { 
+            temperature: "18°C - 30°C", 
+            humidity: "60% - 80%", 
+            water: "5.4 liters/day" // 1.5 inches/week → 38.1 liters/week ÷ 7
+        },
+        cucumber: { 
+            temperature: "18°C - 24°C", 
+            humidity: "75% - 85%", 
+            water: "6.5 liters/day" // 1.8 inches/week → 45.72 liters/week ÷ 7
+        }
+    };
+
+            if (plantData[plantName]) {
+                const { temperature, humidity, water } = plantData[plantName];
+                document.getElementById("plant-details").innerHTML = `
+                    <p><strong>Temperature:</strong> ${temperature}</p>
+                    <p><strong>Humidity:</strong> ${humidity}</p>
+                    <p><strong>Water Requirement:</strong> ${water}</p>
+                `;
+            } else {
+                document.getElementById("plant-details").innerText = "Plant details not found. Please try another name.";
+            }
+        }
+
+        // Automatically fetch weather information
+        async function fetchWeather() {
+            const apiKey = '25927b6e1a6ba703b7afef7d047f4c82'; // Replace with your OpenWeatherMap API key
+            const city = 'Kuala Lumpur'; // Replace with your desired city
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                document.getElementById('weather').innerHTML = `
+                    <p><strong>Current Weather:</strong> ${data.weather[0].description}, ${data.main.temp}°C</p>
+                    <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+                `;
+            } catch (error) {
+                document.getElementById('weather').innerText = 'Failed to fetch weather data.';
+            }
+        }
+
+        // Fetch weather data on page load
+        window.onload = fetchWeather;
+    </script>
+</body>
+</html>
