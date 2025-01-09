@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Farming Overview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        nav {
+            background-color: #136207;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        nav .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        nav .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        nav span {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px #000;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #333;
+        }
+        nav button {
+            background-color: white;
+            color: #136207;
+            border: 2px solid #136207;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        nav button:hover {
+            background-color: #136207;
+            color: white;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        h2 {
+            color: #136207;
+        }
+        .content {
+            padding: 10px;
+        }
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel {
+            display: flex;
+            gap: 20px;
+            scroll-behavior: smooth;
+            overflow-x: scroll;
+            scrollbar-width: none; /* For Firefox */
+        }
+        .carousel::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+        .carousel img {
+            height: 300px;  /* Fixed height for images */
+            width: auto;    /* Width adjusts based on the aspect ratio */
+            border-radius: 10px;
+        }
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .carousel-button.left {
+            left: 10px;
+        }
+        .carousel-button.right {
+            right: 10px;
+        }
+        .developer-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .developer-info img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+        .section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Background colors for each section */
+        .section:nth-child(2) {
+            background: linear-gradient(135deg, #e3ffe7, #d9e7ff);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(3) {
+            background: linear-gradient(135deg, #ffe7e7, #fff5d9);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(4) {
+            background: linear-gradient(135deg, #e7fff5, #d9f5ff);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(5) {
+            background: linear-gradient(135deg, #f5e7ff, #ffd9f5);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section:nth-child(6) {
+            background: linear-gradient(135deg, #fff7e7, #e7d9ff);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode {
+            background-color: #333; /* Changes background to dark gray */
+            color: black; /* Changes text color to white */
+        }
+
+        .dark-mode nav {
+            background-color: #555; /* Darkens the navigation bar */
+        }
+
+        .dark-mode nav a {
+            color: white; /* Keeps links white */
+        }
+        nav button#toggle-dark-mode {
+            background-color: white;
+            color: #136207;
+            border: 2px solid #136207;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+    }
+
+        nav button#toggle-dark-mode:hover {
+            background-color: #136207;
+            color: white;
+    }
+       /* Media query for responsiveness */
+       @media (max-width: 600px) {
+            .image img {
+                max-width: 45%; /* Increase size for better visibility on mobile */
+            }
+            nav span {
+                font-size: 1.2rem;
+            }
+            nav .logo img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+         /* Responsive Design */
+         @media (max-width: 600px) {
+            .developer-info img {
+                width: 100px;
+                height: 100px;
+            }
+            nav span {
+                font-size: 1.2rem;
+            }
+            nav .logo img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+        /* Ensure the body and containers are full width */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Make all containers span full width */
+.container {
+    width: 100%;
+    margin: 0;
+    padding: 0; /* Optional: remove internal spacing */
+    box-sizing: border-box; /* Ensures padding is included in width */
+}
+
+/* Optional: Style sections for better visual spacing */
+.section {
+    padding: 20px; /* Add some space inside the sections */
+    background-color: #f9f9f9; /* Light background for contrast */
+    border-bottom: 1px solid #ddd; /* Separator between sections */
+}
+        /* Apply justification to specific sections */
+#developer-info, #abstract, #methodology, #results, #conclusion, #why-us {
+    text-align: justify;
+    line-height: 1.6; /* Optional: improves readability */
+}
+/* Chatbot styles */
+.chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chatbot-header {
+            background-color: #136207;
+            color: white;
+            padding: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .chatbot-input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        .chatbot-input-container input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        .chatbot-input-container button {
+            background-color: #136207;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #136207;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .chatbot-toggle i {
+            margin: 0;
+        }
+
+        .user-message {
+            background-color: #e7f9e7;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            align-self: flex-end;
+            max-width: 80%;
+        }
+
+        .bot-message {
+            background-color: #fff;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            align-self: flex-start;
+            max-width: 80%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+                /* General container styling */
+                div {
+            text-align: center;
+            margin-top: 1px;
+        }
+
+        /* Button styling */
+        .button {
+            display: inline-block;
+            padding: 5px 10px;
+            font-size: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            color: white;
+            background-color: #1b941f; /* Green background */
+            border: none;
+            border-radius: 8px;
+            text-decoration: none; /* Remove underline */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+
+        /* Hover effects */
+        .button:hover {
+            background-color: #45a049; /* Darker green */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        /* Active (click) effect */
+        .button:active {
+            background-color: #3e8e41; /* Even darker green */
+            transform: translateY(2px); /* Pressed effect */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Reduce shadow */
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+        <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Smart Farming Logo">
+            <span>Smart Farming</span>
+        </div>
+        <div>
+                 <a href="SmartFarming.html" class="button">Simulator</a>
+            </button>
+        </div>
+        <button id="toggle-dark-mode">
+            <i class="fas fa-lightbulb"></i>
+        </button>
+    </button>
+    </nav>
+   <!-- Sections -->
+    <div id="developer-info" class="section">
+        <h2>Developer Information</h2>
+        <div class="developer-info">
+            <img src="developer.jpeg" alt="Developer Picture">
+            <div>
+                <p><strong>Name:</strong> Muhammad Hafiy Naim bin Mohd Ismadi</p>
+                <p><strong>Email:</strong> <a href="mailto:muhdhafiynaim@gmail.com">muhdhafiynaim@gmail.com</a></p>
+                <p><strong>University:</strong> Universiti Teknologi MARA (UiTM), Shah Alam</p>
+                <p><strong>Supervised by:</strong> Dr. Roshakimah Binti Mohd Isa</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="abstract" class="section">
+        <h2>Abstract</h2>
+        <div class="content">
+            <p>Integration of IoT technology in agriculture has transformed traditional farming into an innovative and sustainable method with better optimization of resources to enhance production and energy consumption. The project's objective is to develop a household-based IoT-Enhanced Greenhouse Control System. It uses an ESP32 microcontroller integrated with temperature, humidity, soil moisture, and light intensity sensors to provide real-time monitoring of the environment using Looker Studio and Google Sheets. Fan actuators, a water pump actuator, and similar devices will be able to automatically actuate based on signals that work to minimize resource consumption while optimal conditions are maintained. The design includes the capability for renewable energy; this was achieved using solar panels and a rechargeable battery for operationally ecological and sustainable performance. Sensors log data to Google Sheets, displaying their readings on the LCD while having a web server interface for remote monitoring and control. A user-friendly dashboard, in the form of a Looker Studio-designed dashboard, displays real-time and historical information in an actionable format to allow users of the system to make informed decisions. The experimental tests show that this system can operate under stable environmental conditions through ideal temperature, moisture, and lighting conditions while minimizing energy and water supply usage. Its major drawbacks are that it is completely dependent on sunlight and battery for operating power, and the design is intended for small-scale utilization. Future enhancements include the expansion of the sensor suite, integration of AI for predictive analytics using machine learning software, and the development of a mobile application for increased accessibility. The IoT-based Greenhouse Control System represents a sustainable and low-maintenance solution for modern agriculture, transforming household farming practices by promoting resource efficiency and environmental sustainability in line with the SDG and ESG.</p>
+            <!-- No image carousel, as per your request -->
+        </div>
+    </div>
+
+    <div id="methodology" class="section">
+        <h2>Methodology</h2>
+        <div class="content">
+            <p>The IoT-Enhanced Greenhouse Control System was designed to optimize plant care by integrating sensors, actuators, and renewable energy solutions. Key sensors, including the DHT11 for temperature and humidity, soil moisture sensors, an ultrasonic water level sensor, and an LDR for light intensity, were used to monitor environmental conditions. Actuators such as cooling fans, a water pump, and LED lights were activated based on real-time sensor data to maintain optimal greenhouse conditions. The system was powered by solar panels connected to a Lithium-Ion battery via a solar manager, ensuring continuous operation off-grid. Data processing was managed by an ESP32 microcontroller, which logged sensor readings to Google Sheets, displayed data on an LCD, and enabled remote monitoring and control through a web server and Looker Studio dashboard. Automation was implemented for temperature regulation, irrigation, and lighting, with visual alerts provided by LEDs and remote accessibility for user convenience.</p>
+            <div class="carousel-container">
+                <button class="carousel-button left" onclick="scrollCarousel('methodology-carousel', -1)">&#8249;</button>
+                <div id="methodology-carousel" class="carousel">
+                    <a href="https://drive.google.com/drive/u/0/folders/1figRqF-8Bb8HP7AgsXC6mRrl1dXxPYfB" target="_blank">
+                        <img src="methodology-image1.png" alt="Visualization 1">
+                    <a href="https://drive.google.com/drive/u/0/folders/1figRqF-8Bb8HP7AgsXC6mRrl1dXxPYfB" target="_blank">
+                        <img src="methodology-image2.png" alt="Visualization 2">
+                    <a href="https://p3d.in/YPhVF" target="_blank">
+                        <img src="methodology-image3.png" alt="Visualization 3">
+                    <a href="https://sketchfab.com/3d-models/greenhouse-assembly-a2069dee229c43feaa34b894e18d9dd9" target="_blank">
+                        <img src="methodology-image4.png" alt="Visualization 4">
+                    <a href="https://www.youtube.com/watch?v=Vl4yjpisW5g" target="_blank">
+                        <img src="methodology-image5.png" alt="Visualization 5">
+                    </a>
+                </div>
+                <button class="carousel-button right" onclick="scrollCarousel('methodology-carousel', 1)">&#8250;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="results" class="section">
+        <h2>Results</h2>
+        <div class="content">
+            <p>The system demonstrated effective environmental monitoring and automation. Real-time sensor data, including temperature (25-26.2°C), humidity (61-62%), and soil moisture levels, were consistently logged into Google Sheets, providing historical data for analysis. A user-friendly dashboard built in Looker Studio displayed real-time and historical trends, aiding in informed decision-making. The system's responsiveness was tested, with automated actions like fan activation, irrigation, and lighting adjustments successfully maintaining optimal plant growth conditions. While the system proved reliable in most cases, occasional sensor failures highlighted the need for improved error handling mechanisms.</p>
+            <div class="carousel-container">
+                <button class="carousel-button left" onclick="scrollCarousel('results-carousel', -1)">&#8249;</button>
+                <div id="results-carousel" class="carousel">
+                    <!-- Make the first image clickable -->
+                    <a href="https://lookerstudio.google.com/u/0/reporting/833cb432-7a9f-4d14-a4b3-df7ea382f86f/page/7XmSE" target="_blank">
+                        <img src="results-image1.png" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image2.png" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image3.jpg" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image4.jpg" alt="Visualization 1">
+                    <a href="https://docs.google.com/spreadsheets/d/1JJ2N4pElgKM0yoVfMcxhhio6ZUK63k9YPviL3DW7zEU/edit?gid=0#gid=0" target="_blank">
+                        <img src="results-image5.png" alt="Visualization 1">
+                </a>
+                </div>
+                <button class="carousel-button right" onclick="scrollCarousel('results-carousel', 1)">&#8250;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="conclusion" class="section">
+        <h2>Conclusion</h2>
+        <div class="content">
+            <p>The project successfully developed a sustainable and efficient IoT-enabled greenhouse control system tailored for household use. It automated environmental monitoring and resource management, supporting optimal plant growth while reducing water and energy consumption. The system aligns with global sustainability goals by promoting eco-friendly agricultural practices. Future enhancements could include integrating advanced sensors, predictive analytics, and a dedicated mobile app to further improve functionality and user accessibility.</p>
+            <!-- No image carousel, as per your request -->
+        </div>
+    </div>
+    
+    <script>
+        function openSmartFarming() {
+            window.location.href = 'SmartFarming.html';
+        }
+    </script>
+
+    <script>
+        
+        // Dark Mode Toggle
+        document.getElementById('toggle-dark-mode').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        function scrollCarousel(id, direction) {
+            const carousel = document.getElementById(id);
+            const scrollAmount = 320; // Adjust this value for scrolling amount
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth',
+            });
+        }
+                // Scroll animation logic
+                const sections = document.querySelectorAll('.section');
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible'); // Adds 'visible' class when in view
+        }
+    });
+}, {
+    threshold: 0.2 // Trigger when 20% of the section is visible
+});
+
+sections.forEach(section => {
+    observer.observe(section); // Observe each section
+});
+    </script>
+         <!-- Chatbot Toggle Button -->
+    <button class="chatbot-toggle" onclick="toggleChatbot()">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header" onclick="toggleChatbot()">Ask SmartBot</div>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <div class="chatbot-input-container">
+            <input type="text" id="chatbot-input" placeholder="Ask about plants or greenhouses..." onkeydown="handleEnter(event)" />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <div style="background-color: #136207; color: white; padding: 20px; text-align: center;">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+            <!-- Existing content -->
+            <div style="flex: 1; max-width: 500px; margin: 5px;">
+                <h3>Why Us?</h3>
+                <p> Smart farming combines IoT and data analytics to enhance agricultural productivity, reduce costs, and promote sustainability. By optimizing crop growth and minimizing risks, it ensures efficient use of resources while supporting eco-friendly practices. This innovative approach makes it an ideal solution for modern farmers aiming to maximize yields and profitability.</p>
+            </div>
+             
+            <!-- New Section -->
+            <div style="flex: 1; max-width: 500px; margin: 5px;">
+                <h3>Contact Details</h3>
+                <p>Muhammad Hafiy Naim bin Mohd Ismadi<br>
+                   College of Engineering<br>
+                   Universiti Teknologi MARA (UiTM)<br>
+                   40450 Shah Alam, Selangor Darul Ehsan, Malaysia.<br>
+                   Phone: +60169047047<br>
+                   Email: muhdhafiynaim@gmail.com</p>
+            </div>
+        </div>
+       <!-- Footer -->
+       <footer style="text-align: center; padding: 5px; background-color: #136207; color: white;">
+            <p>Copyright © 2024 SmartFarming. All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Toggle chatbot visibility
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbot');
+            chatbot.style.display = chatbot.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Send message to chatbot
+        function sendMessage() {
+            const input = document.getElementById('chatbot-input');
+            const messages = document.getElementById('chatbot-messages');
+            const userMessage = input.value.trim();
+
+            if (userMessage) {
+                // Add user message to chat
+                const userMessageElement = document.createElement('div');
+                userMessageElement.className = 'user-message';
+                userMessageElement.textContent = userMessage;
+                messages.appendChild(userMessageElement);
+
+                // Simulate chatbot response
+                const botMessageElement = document.createElement('div');
+                botMessageElement.className = 'bot-message';
+                botMessageElement.textContent = getChatbotResponse(userMessage);
+                messages.appendChild(botMessageElement);
+
+                // Clear input
+                input.value = '';
+
+                // Scroll to the bottom of the chat
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+
+        // Handle Enter key for input
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Generate chatbot response with enhanced question bank
+        function getChatbotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            if (lowerMessage.includes('plant')) {
+    if (lowerMessage.includes('strawberry')) {
+        return 'Strawberries require well-drained soil, temperatures between 18°C and 24°C, and consistent watering. They thrive with 6–8 hours of sunlight daily.';
+    } else if (lowerMessage.includes('vegetable')) {
+        return 'Vegetables generally need nutrient-rich soil, proper spacing, and 6–8 hours of sunlight. Specific requirements vary by type, such as tomatoes needing more sunlight compared to leafy greens.';
+    } else if (lowerMessage.includes('chili')) {
+        return 'Chilies require warm temperatures (20°C–30°C), well-drained soil, and regular watering without over-saturating. They also need 6–8 hours of sunlight daily.';
+    } else {
+        return 'Plants need proper care, including watering, sunlight, and nutrient-rich soil. What specific plant are you curious about?';
+    }
+} else if (lowerMessage.includes('greenhouse')) {
+    return 'A smart greenhouse uses IoT to monitor and control environmental factors like temperature, humidity, and light. How can I assist you with this?';
+} else if (lowerMessage.includes('iot')) {
+    return 'IoT in agriculture enables real-time monitoring and automation. Would you like to know more about the sensors or actuators used?';
+} else if (lowerMessage.includes('sensor')) {
+    return 'Humidity sensors monitor air moisture levels, while temperature sensors ensure optimal climate control. Do you want details on how to use these sensors in greenhouses?';
+} else if (lowerMessage.includes('actuator')) {
+    return 'Actuators, such as fans and automated irrigation systems, control greenhouse conditions. For example, fans regulate airflow and temperature. Need more details?';
+} else if (lowerMessage.includes('solar')) {
+    return 'Solar-powered systems reduce energy consumption and promote sustainability. Would you like to know how to set up solar panels for your greenhouse?';
+} else if (lowerMessage.includes('setup solar')) {
+    return 'To set up a solar system, determine the energy requirements of your greenhouse, choose suitable solar panels, and connect them to an inverter and battery for energy storage. Need more details?';
+} else if (lowerMessage.includes('automation')) {
+    if (lowerMessage.includes('watering')) {
+        return 'Automated watering systems use moisture sensors to determine when plants need water, ensuring optimal hydration. Would you like to know more?';
+    } else if (lowerMessage.includes('ventilation')) {
+        return 'Automated ventilation systems open or close vents based on temperature and humidity levels. Need guidance on setting up such systems?';
+    } else {
+        return 'Automation simplifies tasks like watering and ventilation in greenhouses. Do you want to know about specific automation techniques?';
+    }
+} else if (lowerMessage.includes('climate')) {
+    return 'Controlling climate conditions is vital for optimal plant growth. Are you looking for ways to maintain ideal conditions?';
+} else if (lowerMessage.includes('maintain ideal')) {
+    return 'To maintain ideal conditions, monitor temperature, humidity, and light using sensors, and automate adjustments with actuators like fans and heaters. Need specifics?';
+} else {
+    return 'I’m here to help with anything related to plants, smart greenhouses, or IoT farming technologies!';
+}
+
+        }
+    </script>
+</body>
+</html>
